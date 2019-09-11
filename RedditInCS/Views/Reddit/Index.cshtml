@@ -1,0 +1,39 @@
+﻿@model List<RedditInCS.Models.BlogPost> 
+
+<h1 align="center">Trending posts</h1>
+<br />
+<form action="/submit" method="get">
+    <button type="submit" class="btn btn-warning">Submit a new blog post</button>
+</form>
+<br />
+<table class="table">
+    <tr>
+        <th>Votes</th>
+        <th>Up Vote</th>
+        <th>Down Vote</th>
+        <th>Title</th>
+        <th>Action</th>
+    </tr>
+    @foreach (var blogPost in Model)
+    {
+        <tr>
+            <td>@blogPost.Count</td>
+            <td>
+                <form action="/upVote?id=@blogPost.BlogPostId" method="post">
+                    <button type="submit" class="btn btn-success">+</button>
+                </form>
+            </td>
+            <td>
+                <form action="/downVote?id=@blogPost.BlogPostId" method="post">
+                    <button type="submit" class="btn btn-danger">-</button>
+                </form>
+            </td>
+            <td><a href="@blogPost.Url">@blogPost.Title</a></td>
+            <td>
+                <form action="/delete?id=@blogPost.BlogPostId" method="post">
+                    <button type="submit" class="btn btn-secondary">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
