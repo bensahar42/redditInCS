@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RedditInCS.Models;
+using RedditInCS.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +10,17 @@ namespace RedditInCS.Controllers
 {
     public class RedditController : Controller
     {
-        private ApplicationContext applicationContext;
-        public RedditController(ApplicationContext applicationContext)
+        private readonly IPostService postService;
+
+        public RedditController(IPostService postService)
         {
-            this.applicationContext = applicationContext;
+            this.postService = postService;
         }
 
         [HttpGet("/")]
         public IActionResult Index()
         {
-            var blogPosts = applicationContext.BlogPosts.OrderByDescending(bp => bp.Count).ToList();
+            var blogPosts = postService.ListAll();
             return View(blogPosts);
         }
 
@@ -30,68 +33,29 @@ namespace RedditInCS.Controllers
         [HttpPost("/add")]
         public IActionResult AddNewBlogPost(BlogPostInput blogPostInput)
         {
-            var BlogPost = new Models.BlogPost
-            {
-                Title = blogPostInput.Title,
-                Url = blogPostInput.Url
-            };
-            applicationContext.Add(BlogPost);
-            applicationContext.SaveChanges();
+            postService.AddNewBlogpost(blogPostInput);
             return Redirect("/");
         }
 
         [HttpPost("/delete")]
         public IActionResult DeleteBlogPost(long id)
         {
-            var blogPost = applicationContext.BlogPosts.SingleOrDefault(bp => bp.BlogPostId == id);
-
-            if(blogPost == null)
-            {
-                return BadRequest();
-            }
-
-            applicationContext.Remove(blogPost);
-            applicationContext.SaveChanges();
-
+            postService.DeleteBlogPost(id);
             return Redirect("/");
         }
 
         [HttpPost("/upVote")]
         public IActionResult UpVote(long id)
         {
-            var blogPost = applicationContext.BlogPosts.SingleOrDefault(bp => bp.BlogPostId == id);
-
-            if (blogPost == null)
-            {
-                return BadRequest();
-            }
-
-            blogPost.Count += 1;
-            applicationContext.SaveChanges();
-
+            postService.Upvote(id);
             return Redirect("/");
         }
 
         [HttpPost("/downVote")]
         public IActionResult DownVote(long id)
         {
-            var blogPost = applicationContext.BlogPosts.SingleOrDefault(bp => bp.BlogPostId == id);
-
-            if (blogPost == null)
-            {
-                return BadRequest();
-            }
-
-            blogPost.Count -= 1;
-            applicationContext.SaveChanges();
-
+            postService.DownVote(id);
             return Redirect("/");
-        }
-
-        public class BlogPostInput
-        {
-            public string Title { get; set; }
-            public string Url { get; set; }
         }
     }
 }

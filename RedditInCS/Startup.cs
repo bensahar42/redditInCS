@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RedditInCS.Services;
 
 namespace RedditInCS
 {
@@ -26,6 +27,7 @@ namespace RedditInCS
             services.AddDbContext<ApplicationContext>(build => {
                 build.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddTransient<IPostService, PostService>();
             services.AddMvc();
         }
 
